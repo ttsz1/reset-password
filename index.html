@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resetowanie hasła</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 400px; margin: auto; }
+    input, button { width: 100%; margin-top: 1rem; padding: 0.6rem; }
+  </style>
+</head>
+<body>
+  <h2>Nowe hasło</h2>
+  <form id="reset-form">
+    <input type="password" id="new-password" placeholder="Nowe hasło" required />
+    <button type="submit">Zmień hasło</button>
+  </form>
+  <p id="message"></p>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+    const supabase = createClient(
+      'https://iwnnwqbtmpeqhdysoewk.supabase.co',
+      'eyJhbGciOiJI...Dzw' // ← zostaw anonKey tylko jeśli nie wrażliwa strona
+    );
+
+    document.getElementById('reset-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('new-password').value;
+
+      const { error } = await supabase.auth.updateUser({ password });
+      const message = document.getElementById('message');
+
+      if (error) {
+        message.textContent = 'Błąd: ' + error.message;
+      } else {
+        message.textContent = 'Hasło zostało pomyślnie zaktualizowane!';
+      }
+    });
+  </script>
+</body>
+</html>
