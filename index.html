@@ -1,68 +1,32 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resetowanie hasła</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 2rem;
-      max-width: 400px;
-      margin: auto;
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+  const supabase = createClient(
+    'https://iwnnwqbtmpeqhdysoewk.supabase.co',
+    'eyJhbGciOiJI...Dzw' // Twój anonKey
+  );
+
+  // 🔐 Zainicjuj sesję z URL (access_token)
+  const { error: sessionError } = await supabase.auth.getSessionFromUrl();
+  if (sessionError) {
+    document.getElementById('message').textContent =
+      'Błąd sesji: ' + sessionError.message;
+  }
+
+  document.getElementById('reset-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('new-password').value;
+
+    // 🔄 Zaktualizuj hasło
+    const { error } = await supabase.auth.updateUser({ password });
+    const msg = document.getElementById('message');
+
+    if (error) {
+      msg.textContent = 'Błąd przy zmianie hasła: ' + error.message;
+      msg.style.color = 'red';
+    } else {
+      msg.textContent = 'Hasło zostało pomyślnie zmienione 🎉';
+      msg.style.color = 'green';
     }
-    h2 { text-align: center; }
-    input, button {
-      width: 100%;
-      margin-top: 1rem;
-      padding: 0.6rem;
-      font-size: 1rem;
-    }
-    #message {
-      margin-top: 1.5rem;
-      color: green;
-      font-weight: bold;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <h2>Nowe hasło</h2>
-  <form id="reset-form">
-    <input type="password" id="new-password" placeholder="Wpisz nowe hasło" required />
-    <button type="submit">Zmień hasło</button>
-  </form>
-  <p id="message"></p>
-
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
-
-    const supabase = createClient(
-      'https://iwnnwqbtmpeqhdysoewk.supabase.co', // ← Twój projekt Supabase
-      'eyJhbGciOiJI...Dzw' // ← Anon key (może zostać, bo to publiczna strona)
-    );
-
-    // Próba zainicjowania sesji z URL
-    const { error: linkError } = await supabase.auth.getSessionFromUrl();
-    if (linkError) {
-      document.getElementById('message').textContent = 'Nie udało się uwierzytelnić sesji: ' + linkError.message;
-    }
-
-    document.getElementById('reset-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const password = document.getElementById('new-password').value;
-
-      const { error } = await supabase.auth.updateUser({ password });
-      const msg = document.getElementById('message');
-
-      if (error) {
-        msg.textContent = 'Błąd przy zmianie hasła: ' + error.message;
-        msg.style.color = 'red';
-      } else {
-        msg.textContent = 'Hasło zostało pomyślnie zmienione 🎉';
-        msg.style.color = 'green';
-      }
-    });
-  </script>
-</body>
-</html>
+  });
+</script>
