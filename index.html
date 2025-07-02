@@ -5,14 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Resetowanie hasła</title>
   <style>
-    body { font-family: sans-serif; padding: 2rem; max-width: 400px; margin: auto; }
-    input, button { width: 100%; margin-top: 1rem; padding: 0.6rem; }
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      max-width: 400px;
+      margin: auto;
+    }
+    h2 { text-align: center; }
+    input, button {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.6rem;
+      font-size: 1rem;
+    }
+    #message {
+      margin-top: 1.5rem;
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
   <h2>Nowe hasło</h2>
   <form id="reset-form">
-    <input type="password" id="new-password" placeholder="Nowe hasło" required />
+    <input type="password" id="new-password" placeholder="Wpisz nowe hasło" required />
     <button type="submit">Zmień hasło</button>
   </form>
   <p id="message"></p>
@@ -21,21 +38,29 @@
     import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
     const supabase = createClient(
-      'https://iwnnwqbtmpeqhdysoewk.supabase.co',
-      'eyJhbGciOiJI...Dzw' // ← zostaw anonKey tylko jeśli nie wrażliwa strona
+      'https://iwnnwqbtmpeqhdysoewk.supabase.co', // ← Twój projekt Supabase
+      'eyJhbGciOiJI...Dzw' // ← Anon key (może zostać, bo to publiczna strona)
     );
+
+    // Próba zainicjowania sesji z URL
+    const { error: linkError } = await supabase.auth.getSessionFromUrl();
+    if (linkError) {
+      document.getElementById('message').textContent = 'Nie udało się uwierzytelnić sesji: ' + linkError.message;
+    }
 
     document.getElementById('reset-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const password = document.getElementById('new-password').value;
 
       const { error } = await supabase.auth.updateUser({ password });
-      const message = document.getElementById('message');
+      const msg = document.getElementById('message');
 
       if (error) {
-        message.textContent = 'Błąd: ' + error.message;
+        msg.textContent = 'Błąd przy zmianie hasła: ' + error.message;
+        msg.style.color = 'red';
       } else {
-        message.textContent = 'Hasło zostało pomyślnie zaktualizowane!';
+        msg.textContent = 'Hasło zostało pomyślnie zmienione 🎉';
+        msg.style.color = 'green';
       }
     });
   </script>
