@@ -1,0 +1,6 @@
+git clone https://github.com/twoj-nick/reset-password
+cd reset-password
+# skopiuj index.html do folderu
+git add index.html
+git commit -m "dodano stronę resetu hasła"
+git push
